@@ -20,13 +20,27 @@
 */
 #include "../../SDL_internal.h"
 
-#ifndef SDL_ps5osmesa_h_
-#define SDL_ps5osmesa_h_
+#ifndef SDL_ps5vulkan_h_
+#define SDL_ps5vulkan_h_
 
+#include "../SDL_vulkan_internal.h"
 #include "../SDL_sysvideo.h"
 
-int PS5_OSMesa_InitDevice(SDL_VideoDevice* dev);
+#if defined(SDL_VIDEO_VULKAN) && defined(SDL_VIDEO_DRIVER_PS5)
 
-#endif /* SDL_ps5osmesa_h_ */
+int PS5_Vulkan_LoadLibrary(_THIS, const char *path);
+void PS5_Vulkan_UnloadLibrary(_THIS);
+SDL_bool PS5_Vulkan_GetInstanceExtensions(_THIS,
+                                          SDL_Window *window,
+                                          unsigned *count,
+                                          const char **names);
+SDL_bool PS5_Vulkan_CreateSurface(_THIS,
+                                  SDL_Window *window,
+                                  VkInstance instance,
+                                  VkSurfaceKHR *surface);
+
+#endif
+
+#endif /* SDL_ps5vulkan_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

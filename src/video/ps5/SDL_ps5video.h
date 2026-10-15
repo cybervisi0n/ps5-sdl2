@@ -38,8 +38,16 @@ typedef struct PS5_VideoAttr {
     uint8_t junk0[80];
 } PS5_VideoAttr;
 
+/* The resolution Mesa's VideoOut WSI scans out (VIDEOOUT_WIDTH and
+ * VIDEOOUT_HEIGHT in wsi_common_videoout.c and platform_videoout.c): every
+ * OpenGL (EGL) and Vulkan window surface has this size. */
+#define PS5_GPU_OUTPUT_WIDTH  3840
+#define PS5_GPU_OUTPUT_HEIGHT 2160
+
 typedef struct PS5_DeviceData
 {
+    /* VideoOut as SDL drives it for window framebuffers, opened on first
+       use (-1 when closed) so that Mesa can have it instead. */
     int handle;
     PS5_VideoBuf vbuf[2];
     struct kevent *evt_queue;
@@ -47,7 +55,24 @@ typedef struct PS5_DeviceData
     size_t memsize;
     SDL_Surface *surface;
     PS5_Tilemap* tmap;
+
+    /* Mesa's VideoOut WSI drives the display (OpenGL through EGL, or
+       Vulkan): SDL has handed VideoOut over and never opens it again, as
+       Mesa holds it until the process exits. */
+    SDL_bool gpu_output;
 } PS5_DeviceData;
+
+typedef struct SDL_WindowData
+{
+    void *egl_surface; /* EGLSurface of an OpenGL window on EGL */
+} SDL_WindowData;
+
+/* Closes SDL's VideoOut handle and frees its framebuffers, if open. */
+void PS5_VideoOut_Release(_THIS);
+
+/* Hands the display to Mesa's VideoOut WSI: closes SDL's VideoOut and
+   reports the WSI's resolution as the display's only mode. */
+void PS5_UseGPUOutput(_THIS);
 
 int sceSystemServiceHideSplashScreen(void);
 
