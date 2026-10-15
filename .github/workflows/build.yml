@@ -1,0 +1,31 @@
+name: build
+
+on:
+  push:
+    branches: [ release-2.30.x-ps5 ]
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Software
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends fuse git python3 wget zip
+
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+
+      - name: Create build container image
+        run: ./drun.sh echo done
+
+      - name: Build
+        run: ./drun.sh ./scripts/ci_build.sh
