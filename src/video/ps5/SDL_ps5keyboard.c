@@ -133,53 +133,53 @@ static SceImeDialogParam g_ime_dialog_param =
 
 int PS5_Keyboard_Open(void)
 {
-    int user_id;
-    long junk;
-    int err;
-
-    err = sceUserServiceGetForegroundUser(&user_id);
-    if (err != 0) {
-        return SDL_SetError("sceUserServiceGetForegroundUser: 0x%08x", err);
-    }
-
-    g_ime_dialog_param.userId = user_id;
-    g_keyboard_handle = sceKeyboardOpen(user_id, 0, 0, &junk);
-    if (g_keyboard_handle <= 0) {
-        return SDL_SetError("sceKeyboardOpen: 0x%08x", g_keyboard_handle);
-    }
+    //int user_id;
+    //long junk;
+    //int err;
+//
+    //err = sceUserServiceGetForegroundUser(&user_id);
+    //if (err != 0) {
+    //    return SDL_SetError("sceUserServiceGetForegroundUser: 0x%08x", err);
+    //}
+//
+    //g_ime_dialog_param.userId = user_id;
+    //g_keyboard_handle = sceKeyboardOpen(user_id, 0, 0, &junk);
+    //if (g_keyboard_handle <= 0) {
+    //    return SDL_SetError("sceKeyboardOpen: 0x%08x", g_keyboard_handle);
+    //}
 
     return 0;
 }
 
 int PS5_Keyboard_Close(void)
 {
-    int err;
-
-    if (g_keyboard_handle <= 0) {
-        return 0;
-    }
-
-    err = sceKeyboardClose(g_keyboard_handle);
-    if (err != 0) {
-        return SDL_SetError("sceKeyboardClose: 0x%08x", err);
-    }
+    //int err;
+//
+    //if (g_keyboard_handle <= 0) {
+    //    return 0;
+    //}
+//
+    //err = sceKeyboardClose(g_keyboard_handle);
+    //if (err != 0) {
+    //    return SDL_SetError("sceKeyboardClose: 0x%08x", err);
+    //}
 
     return 0;
 }
 
 int PS5_Keyboard_Init(void)
 {
-    int err;
-
-    err = sceUserServiceInitialize(0);
-    if (err != 0 && err != 0x80960003) {
-        return SDL_SetError("sceUserServiceInitialize: 0x%08x", err);
-    }
-
-    err = sceKeyboardInit();
-    if (err != 0) {
-        return SDL_SetError("sceKeyboardInit: 0x%08x", err);
-    }
+    //int err;
+//
+    //err = sceUserServiceInitialize(0);
+    //if (err != 0 && err != 0x80960003) {
+    //    return SDL_SetError("sceUserServiceInitialize: 0x%08x", err);
+    //}
+//
+    //err = sceKeyboardInit();
+    //if (err != 0) {
+    //    return SDL_SetError("sceKeyboardInit: 0x%08x", err);
+    //}
 
     return 0;
 }
@@ -235,98 +235,98 @@ static int PS5_ImeDialog_PumpEvents(void)
 
 int PS5_Keyboard_PumpEvents(void)
 {
-    keyboard_state_t curr;
-    uint32_t diff;
-    int err;
-
-    PS5_ImeDialog_PumpEvents();
-
-    if (g_keyboard_handle <= 0) {
-        return 0;
-    }
-
-    err = sceKeyboardReadState(g_keyboard_handle, &curr);
-    if (err != 0) {
-        return SDL_SetError("sceKeyboardReadState: 0x%08x", err);
-    }
-
-    if (!curr.available) {
-        return 0;
-    }
-
-    diff = g_prev_keyboard_state.modifiers ^ curr.modifiers;
-    if (diff) {
-        if (diff & 0x01) {
-            if (g_prev_keyboard_state.modifiers & 0x01) {
-                SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_LCTRL);
-            } else {
-                SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_LCTRL);
-            }
-        }
-        if (diff & 0x02) {
-            if (g_prev_keyboard_state.modifiers & 0x02) {
-                SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_LSHIFT);
-            } else {
-                SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_LSHIFT);
-            }
-        }
-        if (diff & 0x04) {
-            if (g_prev_keyboard_state.modifiers & 0x04) {
-                SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_LALT);
-            } else {
-                SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_LALT);
-            }
-        }
-        if (diff & 0x08) {
-            if (g_prev_keyboard_state.modifiers & 0x08) {
-                SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_LGUI);
-            } else {
-                SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_LGUI);
-            }
-        }
-        if (diff & 0x10) {
-            if (g_prev_keyboard_state.modifiers & 0x10) {
-                SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_RCTRL);
-            } else {
-                SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_RCTRL);
-            }
-        }
-        if (diff & 0x20) {
-            if (g_prev_keyboard_state.modifiers & 0x20) {
-                SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_RSHIFT);
-            } else {
-                SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_RSHIFT);
-            }
-        }
-        if (diff & 0x40) {
-            if (g_prev_keyboard_state.modifiers & 0x40) {
-                SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_RALT);
-            } else {
-                SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_RALT);
-            }
-        }
-        if (diff & 0x80) {
-            if (g_prev_keyboard_state.modifiers & 0x80) {
-                SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_RGUI);
-            } else {
-                SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_RGUI);
-            }
-        }
-    }
-
-    for (int i = 0; i < 16; i++) {
-        if (g_prev_keyboard_state.scankey[i] == curr.scankey[i]) {
-            continue;
-        }
-
-        if (g_prev_keyboard_state.scankey[i] == 0) {
-            SDL_SendKeyboardKey(SDL_PRESSED, curr.scankey[i]);
-        } else {
-            SDL_SendKeyboardKey(SDL_RELEASED, g_prev_keyboard_state.scankey[i]);
-        }
-    }
-
-    memcpy(&g_prev_keyboard_state, &curr, sizeof(curr));
+    //keyboard_state_t curr;
+    //uint32_t diff;
+    //int err;
+//
+    //PS5_ImeDialog_PumpEvents();
+//
+    //if (g_keyboard_handle <= 0) {
+    //    return 0;
+    //}
+//
+    //err = sceKeyboardReadState(g_keyboard_handle, &curr);
+    //if (err != 0) {
+    //    return SDL_SetError("sceKeyboardReadState: 0x%08x", err);
+    //}
+//
+    //if (!curr.available) {
+    //    return 0;
+    //}
+//
+    //diff = g_prev_keyboard_state.modifiers ^ curr.modifiers;
+    //if (diff) {
+    //    if (diff & 0x01) {
+    //        if (g_prev_keyboard_state.modifiers & 0x01) {
+    //            SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_LCTRL);
+    //        } else {
+    //            SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_LCTRL);
+    //        }
+    //    }
+    //    if (diff & 0x02) {
+    //        if (g_prev_keyboard_state.modifiers & 0x02) {
+    //            SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_LSHIFT);
+    //        } else {
+    //            SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_LSHIFT);
+    //        }
+    //    }
+    //    if (diff & 0x04) {
+    //        if (g_prev_keyboard_state.modifiers & 0x04) {
+    //            SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_LALT);
+    //        } else {
+    //            SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_LALT);
+    //        }
+    //    }
+    //    if (diff & 0x08) {
+    //        if (g_prev_keyboard_state.modifiers & 0x08) {
+    //            SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_LGUI);
+    //        } else {
+    //            SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_LGUI);
+    //        }
+    //    }
+    //    if (diff & 0x10) {
+    //        if (g_prev_keyboard_state.modifiers & 0x10) {
+    //            SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_RCTRL);
+    //        } else {
+    //            SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_RCTRL);
+    //        }
+    //    }
+    //    if (diff & 0x20) {
+    //        if (g_prev_keyboard_state.modifiers & 0x20) {
+    //            SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_RSHIFT);
+    //        } else {
+    //            SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_RSHIFT);
+    //        }
+    //    }
+    //    if (diff & 0x40) {
+    //        if (g_prev_keyboard_state.modifiers & 0x40) {
+    //            SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_RALT);
+    //        } else {
+    //            SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_RALT);
+    //        }
+    //    }
+    //    if (diff & 0x80) {
+    //        if (g_prev_keyboard_state.modifiers & 0x80) {
+    //            SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_RGUI);
+    //        } else {
+    //            SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_RGUI);
+    //        }
+    //    }
+    //}
+//
+    //for (int i = 0; i < 16; i++) {
+    //    if (g_prev_keyboard_state.scankey[i] == curr.scankey[i]) {
+    //        continue;
+    //    }
+//
+    //    if (g_prev_keyboard_state.scankey[i] == 0) {
+    //        SDL_SendKeyboardKey(SDL_PRESSED, curr.scankey[i]);
+    //    } else {
+    //        SDL_SendKeyboardKey(SDL_RELEASED, g_prev_keyboard_state.scankey[i]);
+    //    }
+    //}
+//
+    //memcpy(&g_prev_keyboard_state, &curr, sizeof(curr));
 
     return 0;
 }

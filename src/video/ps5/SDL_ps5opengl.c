@@ -36,10 +36,13 @@
 #include "SDL_ps5video.h"
 #include "SDL_ps5opengl.h"
 
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+
 #define PS5_DEFAULT_EGL "libEGL.so.1"
 
 /* Any non-zero native window is the display (platform_videoout.c). */
-#define PS5_EGL_NATIVE_WINDOW ((NativeWindowType)1)
+#define PS5_EGL_NATIVE_WINDOW ((NativeWindowType)0)
 
 static void *ps5_egl_global_handle = NULL;
 
@@ -47,6 +50,37 @@ static int PS5_EGL_LoadLibrary(_THIS, const char *path)
 {
     
     // EGL is static linked
+    _this->egl_data = (struct SDL_EGL_VideoData *)SDL_calloc(1, sizeof(SDL_EGL_VideoData));
+
+
+    // Initialize egl
+    _this->egl_data->eglGetDisplay = eglGetDisplay;
+    //_this->egl_data->eglGetPlatformDisplay = (void*)eglGetPlatformDisplay;
+    _this->egl_data->eglInitialize = eglInitialize;
+    _this->egl_data->eglTerminate = eglTerminate;
+    _this->egl_data->eglGetProcAddress = (void*)eglGetProcAddress;
+    _this->egl_data->eglChooseConfig = eglChooseConfig;
+    _this->egl_data->eglCreateContext = eglCreateContext;
+    _this->egl_data->eglDestroyContext = eglDestroyContext;
+    _this->egl_data->eglCreatePbufferSurface = eglCreatePbufferSurface;
+    _this->egl_data->eglCreateWindowSurface = eglCreateWindowSurface;
+    _this->egl_data->eglDestroySurface = eglDestroySurface;
+    _this->egl_data->eglMakeCurrent = eglMakeCurrent;
+    _this->egl_data->eglSwapBuffers = eglSwapBuffers;
+    _this->egl_data->eglSwapInterval = eglSwapInterval;
+    _this->egl_data->eglQueryString = eglQueryString;
+    _this->egl_data->eglQueryAPI = eglQueryAPI;
+    _this->egl_data->eglGetConfigAttrib = eglGetConfigAttrib;
+    _this->egl_data->eglWaitNative = eglWaitNative;
+    _this->egl_data->eglWaitGL = eglWaitGL;
+    _this->egl_data->eglBindAPI = eglBindAPI;
+    _this->egl_data->eglGetError = eglGetError;
+
+    _this->egl_data->egl_display = _this->egl_data->eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    _this->egl_data->egl_surfacetype = EGL_WINDOW_BIT;
+    eglInitialize(_this->egl_data->egl_display, NULL, NULL);
+
+
 
     /* EGL_DEFAULT_DISPLAY is the videoout platform, whatever Mesa's
        default native platform was built as. */
@@ -65,10 +99,6 @@ int PS5_EGL_CreateWindowSurface(_THIS, SDL_Window *window)
     SDL_WindowData *data = (SDL_WindowData *)window->driverdata;
     EGLSurface surface;
 
-    if (!_this->egl_data) {
-        return SDL_SetError("EGL is not loaded");
-    }
-
     surface = SDL_EGL_CreateSurface(_this, PS5_EGL_NATIVE_WINDOW);
     if (surface == EGL_NO_SURFACE) {
         return -1; /* SDL_EGL_CreateSurface has set the error */
@@ -84,9 +114,7 @@ void PS5_EGL_DestroyWindowSurface(_THIS, SDL_Window *window)
     SDL_WindowData *data = (SDL_WindowData *)window->driverdata;
 
     if (data && data->egl_surface != EGL_NO_SURFACE) {
-        if (_this->egl_data) {
-            SDL_EGL_DestroySurface(_this, data->egl_surface);
-        }
+        SDL_EGL_DestroySurface(_this, data->egl_surface);
         data->egl_surface = EGL_NO_SURFACE;
     }
 }
