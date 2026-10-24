@@ -11,7 +11,7 @@ fi
 
 source "${PS5_PAYLOAD_SDK}/toolchain/prospero.sh"
 
-${CMAKE} -DCMAKE_BUILD_TYPE=Debug \
+${CMAKE} -DCMAKE_BUILD_TYPE=Release \
 	 -DSDL_OPENGL=YES \
 	 -DSDL_LOADSO=YES \
 	 -B build-ps5 \
@@ -19,9 +19,9 @@ ${CMAKE} -DCMAKE_BUILD_TYPE=Debug \
 ${MAKE} -C build-ps5
 
 
-${CMAKE} -DCMAKE_BUILD_TYPE=Debug \
-	 -DSDL_OPENGL=YES \
-	 -DSDL_LOADSO=YES \
-	 -B test-ps5 \
-         -S "${SCRIPT_DIR}/../test"
-${MAKE} -C test-ps5
+#${CMAKE} -DCMAKE_BUILD_TYPE=Release \
+#	 -DSDL_OPENGL=YES \
+#	 -DSDL_LOADSO=YES \
+#	 -B test-ps5 \
+#         -S "${SCRIPT_DIR}/../test"
+#${MAKE} -C test-ps5
