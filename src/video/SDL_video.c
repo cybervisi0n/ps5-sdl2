@@ -448,6 +448,10 @@ const char *SDL_GetVideoDriver(int index)
  */
 int SDL_VideoInit(const char *driver_name)
 {
+    #ifdef __PROSPERO__
+    // Force the ps5-g19 driver
+    driver_name = "ps5-g19";
+    #endif
     SDL_VideoDevice *video;
     SDL_bool init_events = SDL_FALSE;
     SDL_bool init_keyboard = SDL_FALSE;
