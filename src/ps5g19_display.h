@@ -6,8 +6,8 @@
 #include <ps5_opengl_display.h>
 #else
 /* SDKs predating the profile header retain the explicit legacy 1080p60 mode. */
-#define PS5_OPENGL_NATIVE_WIDTH 1920
-#define PS5_OPENGL_NATIVE_HEIGHT 1080
+#define PS5_OPENGL_NATIVE_WIDTH 3840
+#define PS5_OPENGL_NATIVE_HEIGHT 2160
 #define PS5_OPENGL_NATIVE_FPS 60
 #endif
 

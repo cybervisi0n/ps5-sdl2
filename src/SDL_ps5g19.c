@@ -37,7 +37,7 @@ static int video_init(_THIS)
 {
     G19 *g = _this->driverdata;
     int index;
-    SDL_DisplayMode mode = { SDL_PIXELFORMAT_ABGR8888, PS5_OPENGL_NATIVE_WIDTH,
+    SDL_DisplayMode mode = { SDL_PIXELFORMAT_ARGB8888, PS5_OPENGL_NATIVE_WIDTH,
                             PS5_OPENGL_NATIVE_HEIGHT, PS5_OPENGL_NATIVE_FPS, NULL };
     g->thread = SDL_ThreadID();
     g->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
@@ -84,18 +84,6 @@ static int create_window(_THIS, SDL_Window *window)
         EGL_STENCIL_SIZE, _this->gl_config.stencil_size, EGL_NONE
     };
     if (on_thread(g) < 0) return -1;
-    if (g->window || g->surface || window->w != PS5_OPENGL_NATIVE_WIDTH ||
-        window->h != PS5_OPENGL_NATIVE_HEIGHT ||
-        !(window->flags & SDL_WINDOW_OPENGL) || (window->flags & SDL_WINDOW_RESIZABLE))
-        return SDL_SetError("G19 requires one fixed %dx%d OpenGL window",
-                            PS5_OPENGL_NATIVE_WIDTH, PS5_OPENGL_NATIVE_HEIGHT);
-    if (_this->gl_config.stereo || _this->gl_config.multisamplebuffers ||
-        _this->gl_config.multisamplesamples || _this->gl_config.floatbuffers ||
-        _this->gl_config.framebuffer_srgb_capable || _this->gl_config.accum_red_size ||
-        _this->gl_config.accum_green_size || _this->gl_config.accum_blue_size ||
-        _this->gl_config.accum_alpha_size || _this->gl_config.buffer_size > 32 ||
-        !_this->gl_config.double_buffer)
-        return SDL_SetError("G19 SDL supports double-buffered RGBA8 without MSAA, stereo, accumulation or sRGB");
     if (!eglChooseConfig(g->display, attributes, &g->config, 1, &count))
         return egl_error("eglChooseConfig");
     if (count != 1) return SDL_SetError("G19 has no matching EGL config");
