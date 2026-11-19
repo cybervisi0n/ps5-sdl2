@@ -239,22 +239,26 @@ static void PS5_JoystickUpdate(SDL_Joystick *joystick)
                 } else {
                     SDL_PrivateJoystickButton(joystick, i, SDL_RELEASED);
                 }
-
-                // handle hat
-                if (i == 11 && (pad.buttons & btn_map[i])) {
-                    hat |= SDL_HAT_UP;
-                } else if (i == 12 && (pad.buttons & btn_map[i])) {
-                    hat |= SDL_HAT_DOWN;
-                } else if (i == 13 && (pad.buttons & btn_map[i])) {
-                    hat |= SDL_HAT_LEFT;
-                } else if (i == 14 && (pad.buttons & btn_map[i])) {
-                    hat |= SDL_HAT_RIGHT;
-                }
             }
         }
-        // send hat events now
-        SDL_PrivateJoystickHat(joystick, 0, hat);
     }
+
+    // handle hat
+    if (pad.buttons & btn_map[11]) {
+        hat |= SDL_HAT_UP;
+    }
+    if (pad.buttons & btn_map[12]) {
+        hat |= SDL_HAT_DOWN;
+    }
+    if (pad.buttons & btn_map[13]) {
+        hat |= SDL_HAT_LEFT;
+    }
+    if (pad.buttons & btn_map[14]) {
+        hat |= SDL_HAT_RIGHT;
+    }
+
+    // Send Hat
+    SDL_PrivateJoystickHat(joystick, 0, hat);
 
     memcpy(&ctx->pad, &pad, sizeof(pad));
 }
